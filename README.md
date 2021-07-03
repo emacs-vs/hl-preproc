@@ -6,7 +6,11 @@
 
 ## :floppy_disk: Quickstart
 
-N/A
+```el
+(use-package hl-preproc
+  :ensure t
+  :hook (csharp-mode . (lambda () (hl-preproc-mode 1))))
+```
 
 ## Contribution
 
