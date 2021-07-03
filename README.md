@@ -5,7 +5,7 @@
 > Unhighlight invalid preprocessor region
 
 <p align="center">
-  <img src="./etc/demo.png"/>
+  <img src="./etc/demo.png" width="462" height="359"/>
 </p>
 
 This package uses [meta-net](https://github.com/emacs-vs/meta-net) to parse
