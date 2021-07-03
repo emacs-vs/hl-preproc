@@ -6,7 +6,7 @@
 ;; Author: Shen, Jen-Chieh <jcs090218@gmail.com>
 ;; Description: Unhighlight invalid preprocessor region
 ;; Keyword: preprocessor
-;; Version: 0.0.1
+;; Version: 0.1.0
 ;; Package-Requires: ((emacs "24.3"))
 ;; URL: https://github.com/jcs090218/hl-preproc
 
