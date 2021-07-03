@@ -10,8 +10,8 @@
 
 This package uses [meta-net](https://github.com/emacs-vs/meta-net) to parse
 all define constants inside a csproj file. The output of the highlighting
-should be very close to IDE but more lightweight since we only extract
-information we need.
+should be very close to IDE but more lightweight. We only extract information
+we need to do the highlighting.
 
 ## :floppy_disk: Quickstart
 
