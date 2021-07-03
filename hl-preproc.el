@@ -151,9 +151,29 @@ If REFRESH is non-nil, refresh cache once."
     (when expression (cons direc (list expression beg end)))))
 
 (defun hl-preproc--define-check (expression)
-  "Return non-nil if EXPRESSION is true."
-  ;; TODO: ..
-  (member expression (hl-preproc-all-constants)))
+  "Return non-nil if EXPRESSION is defined."
+  (let ((constants (hl-preproc-all-constants)))
+    (cl-some
+     (lambda (constant)
+       ;; TODO: This need to improve for a complex expression, especially
+       ;; the nested logic. Right now, this will work with direct
+       ;; C# directives expression.
+       ;;
+       ;; > What's working?
+       ;;
+       ;;   - DEBUG
+       ;;   - (DEBUG)
+       ;;   - !DEBUG
+       ;;   - !(DEBUG)
+       ;;   - DEBUG || !(DEBUG)
+       ;;
+       ;;  > What's not working?
+       ;;
+       ;;   - ((DEBUG || !(DEBUG)) && DEBUG)
+       ;;
+       ;; Basically, everything without nested logic should work!
+       (string-match-p (format "^[(|& \t]*%s" constant) expression))
+     constants)))
 
 (defun hl-preproc--do-highlight (buffer)
   "Highlight BUFFER with overlays."
@@ -166,12 +186,11 @@ If REFRESH is non-nil, refresh cache once."
         (while (progn (setq region (hl-preproc--next-constant-region)) region)
           (setq direc (car region) expression (nth 0 (cdr region))
                 beg (nth 1 (cdr region)) end (nth 2 (cdr region)))
-          (jcs-print direc expression)
           (if (and (hl-preproc--define-check expression) (not last-true))
               (setq last-true t)
             (cl-case direc
               (t-if (hl-preproc--overlay beg end))
-              (t-elif (when last-true (hl-preproc--overlay beg end)))
+              (t-elif (hl-preproc--overlay beg end))
               (t-else (when last-true (hl-preproc--overlay beg end))
                       (setq last-true nil)))))))))
 
