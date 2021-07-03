@@ -4,6 +4,15 @@
 # hl-preproc
 > Unhighlight invalid preprocessor region
 
+<p align="center">
+  <img src="./etc/demo.png"/>
+</p>
+
+This package uses [meta-net](https://github.com/emacs-vs/meta-net) to parse
+all define constants inside a csproj file. The output of the highlighting
+should be very close to IDE but more lightweight since we only extract
+information we need.
+
 ## :floppy_disk: Quickstart
 
 ```el
