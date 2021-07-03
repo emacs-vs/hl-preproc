@@ -106,6 +106,32 @@ If REFRESH is non-nil, refresh cache once."
 ;; (@* "Core" )
 ;;
 
+(defun hl-preproc--define-check (expression)
+  "Return non-nil if EXPRESSION is defined."
+  (let ((constants (hl-preproc-all-constants)))
+    (cl-some
+     (lambda (constant)
+       ;; TODO: This need to improve for a complex expression, especially
+       ;; the nested logic. Right now, this will work with direct
+       ;; C# directives expression.
+       ;;
+       ;; > What's working?
+       ;;
+       ;;   - DEBUG
+       ;;   - (DEBUG)
+       ;;   - !DEBUG
+       ;;   - !(DEBUG)
+       ;;   - DEBUG || !(DEBUG)
+       ;;
+       ;;  > What's not working?
+       ;;
+       ;;   - ((DEBUG || !(DEBUG)) && DEBUG)
+       ;;
+       ;; Basically, everything without nested logic should work!
+       (and (string-match-p (format "\\_<%s\\_>" constant) expression)
+            (not (string-match-p (format "![ \t]*\\_<%s\\_>" constant) expression))))
+     constants)))
+
 (defun hl-preproc--overlay (beg end)
   "Place invalid overlay from BEG to END."
   (let ((ov (make-overlay beg end)))
@@ -136,45 +162,23 @@ If REFRESH is non-nil, refresh cache once."
 (defun hl-preproc--next-constant-region ()
   "Return a cons cell of (expression . (beg end))."
   (let* ((starting (hl-preproc--next-starting-directives))
-         (direc (car starting)) (starting-pt (cdr starting))
-         expression beg end elif else endif)
+         (start-direc (car starting)) end-direc
+         (starting-pt (cdr starting))
+         expression beg end p-elif p-else p-endif)
     (unless (= (point-max) starting-pt)
       (goto-char starting-pt)
       (setq beg (1+ (line-end-position))  ; to next line
             expression (buffer-substring (point) beg)
             expression (string-trim expression)
-            elif (hl-preproc--search-directives "elif")
-            else (hl-preproc--search-directives "else")
-            endif (hl-preproc--search-directives "endif")
-            end (min (or elif (point-max)) (or else (point-max)) (or endif (point-max)))
+            p-elif (hl-preproc--search-directives "elif")
+            p-else (hl-preproc--search-directives "else")
+            p-endif (hl-preproc--search-directives "endif")
+            end (min (or p-elif (point-max)) (or p-else (point-max)) (or p-endif (point-max)))
+            end-direc (cond ((equal end p-elif) 't-elif)
+                            ((equal end p-else) 't-else)
+                            ((equal end p-endif) 't-endif))
             end (save-excursion (goto-char end) (1- (line-beginning-position)))))
-    (when expression (cons direc (list expression beg end)))))
-
-(defun hl-preproc--define-check (expression)
-  "Return non-nil if EXPRESSION is defined."
-  (let ((constants (hl-preproc-all-constants)))
-    (cl-some
-     (lambda (constant)
-       ;; TODO: This need to improve for a complex expression, especially
-       ;; the nested logic. Right now, this will work with direct
-       ;; C# directives expression.
-       ;;
-       ;; > What's working?
-       ;;
-       ;;   - DEBUG
-       ;;   - (DEBUG)
-       ;;   - !DEBUG
-       ;;   - !(DEBUG)
-       ;;   - DEBUG || !(DEBUG)
-       ;;
-       ;;  > What's not working?
-       ;;
-       ;;   - ((DEBUG || !(DEBUG)) && DEBUG)
-       ;;
-       ;; Basically, everything without nested logic should work!
-       (and (string-match-p (format "\\_<%s\\_>" constant) expression)
-            (not (string-match-p (format "![ \t]*\\_<%s\\_>" constant) expression))))
-     constants)))
+    (when expression (cons (list start-direc end-direc) (list expression beg end)))))
 
 (defun hl-preproc--do-highlight (buffer)
   "Highlight BUFFER with overlays."
@@ -183,17 +187,19 @@ If REFRESH is non-nil, refresh cache once."
   (with-current-buffer buffer
     (save-excursion
       (goto-char (point-min))
-      (let (region direc expression beg end last-true)
+      (let (region start-direc end-direc expression beg end last-true)
         (while (progn (setq region (hl-preproc--next-constant-region)) region)
-          (setq direc (car region) expression (nth 0 (cdr region))
+          (setq start-direc (nth 0 (car region)) end-direc (nth 1 (car region))
+                expression (nth 0 (cdr region))
                 beg (nth 1 (cdr region)) end (nth 2 (cdr region)))
           (if (and (hl-preproc--define-check expression) (not last-true))
               (setq last-true t)
-            (cl-case direc
+            (cl-case start-direc
               (t-if (hl-preproc--overlay beg end))
               (t-elif (hl-preproc--overlay beg end))
               (t-else (when last-true (hl-preproc--overlay beg end))
-                      (setq last-true nil)))))))))
+                      (setq last-true nil))))
+          (when (eq end-direc 't-endif) (setq last-true nil)))))))
 
 (defun hl-preproc--after-cahnge (&rest _)
   "Unhighlight after change."
