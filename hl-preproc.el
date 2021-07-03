@@ -172,7 +172,8 @@ If REFRESH is non-nil, refresh cache once."
        ;;   - ((DEBUG || !(DEBUG)) && DEBUG)
        ;;
        ;; Basically, everything without nested logic should work!
-       (string-match-p (format "^[(|& \t]*%s" constant) expression))
+       (and (string-match-p (format "\\_<%s\\_>" constant) expression)
+            (not (string-match-p (format "![ \t]*\\_<%s\\_>" constant) expression))))
      constants)))
 
 (defun hl-preproc--do-highlight (buffer)
