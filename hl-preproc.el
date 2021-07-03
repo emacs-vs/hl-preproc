@@ -7,8 +7,8 @@
 ;; Description: Unhighlight invalid preprocessor region
 ;; Keyword: preprocessor
 ;; Version: 0.1.0
-;; Package-Requires: ((emacs "24.3") (meta-net "1.0.0"))
-;; URL: https://github.com/jcs090218/hl-preproc
+;; Package-Requires: ((emacs "24.4") (meta-net "1.0.0"))
+;; URL: https://github.com/emacs-vs/hl-preproc
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -33,6 +33,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'subr-x)
 (require 'meta-net)
 
 (defgroup hl-preproc nil
@@ -88,8 +89,7 @@
   "Return a list of constants from current project."
   (let (lst)
     (dolist (path (meta-net-csporj-files))
-      (dolist (constants (meta-net-define-constants path))
-        (setq lst (append lst path))))
+      (setq lst (append lst (meta-net-define-constants path))))
     lst))
 
 (defun hl-preproc-all-constants (&optional refresh)
@@ -113,6 +113,48 @@ If REFRESH is non-nil, refresh cache once."
     (overlay-put ov 'priority hl-preproc-priority)
     (push ov hl-preproc--overlays)))
 
+(defun hl-preproc--keyword (direc)
+  "Return a regular expression to search for DIREC."
+  (format "^[ \t]*#[ \t]*%s" direc))
+
+(defun hl-preproc--search-directives (direc)
+  "Search DIREC in current buffer and return it's point."
+  (save-excursion (re-search-forward (hl-preproc--keyword direc) nil t)))
+
+(defun hl-preproc--next-starting-directives ()
+  "Return information about starting directives in (directives . point)."
+  (let (direc pt d-if d-elif d-else)
+    (setq d-if (hl-preproc--search-directives "if")
+          d-elif (hl-preproc--search-directives "elif")
+          d-else (hl-preproc--search-directives "else"))
+    (setq pt (min (or d-if (point-max)) (or d-elif (point-max)) (or d-else (point-max))))
+    (setq direc (cond ((equal pt d-if) 't-if)
+                      ((equal pt d-elif) 't-elif)
+                      ((equal pt d-else) 't-else)))
+    (cons direc pt)))
+
+(defun hl-preproc--next-constant-region ()
+  "Return a cons cell of (expression . (beg end))."
+  (let* ((starting (hl-preproc--next-starting-directives))
+         (direc (car starting)) (starting-pt (cdr starting))
+         expression beg end elif else endif)
+    (unless (= (point-max) starting-pt)
+      (goto-char starting-pt)
+      (setq beg (1+ (line-end-position))  ; to next line
+            expression (buffer-substring (point) beg)
+            expression (string-trim expression)
+            elif (hl-preproc--search-directives "elif")
+            else (hl-preproc--search-directives "else")
+            endif (hl-preproc--search-directives "endif")
+            end (min (or elif (point-max)) (or else (point-max)) (or endif (point-max)))
+            end (save-excursion (goto-char end) (1- (line-beginning-position)))))
+    (when expression (cons direc (list expression beg end)))))
+
+(defun hl-preproc--define-check (expression)
+  "Return non-nil if EXPRESSION is true."
+  ;; TODO: ..
+  (member expression (hl-preproc-all-constants)))
+
 (defun hl-preproc--do-highlight (buffer)
   "Highlight BUFFER with overlays."
   (unless meta-net-csproj-current (meta-net-read-project))  ; read define constants
@@ -120,9 +162,18 @@ If REFRESH is non-nil, refresh cache once."
   (with-current-buffer buffer
     (save-excursion
       (goto-char (point-min))
-      (while (re-search-forward "#[ \t]*if" nil t)
-        )
-      )))
+      (let (region direc expression beg end last-true)
+        (while (progn (setq region (hl-preproc--next-constant-region)) region)
+          (setq direc (car region) expression (nth 0 (cdr region))
+                beg (nth 1 (cdr region)) end (nth 2 (cdr region)))
+          (jcs-print direc expression)
+          (if (and (hl-preproc--define-check expression) (not last-true))
+              (setq last-true t)
+            (cl-case direc
+              (t-if (hl-preproc--overlay beg end))
+              (t-elif (when last-true (hl-preproc--overlay beg end)))
+              (t-else (when last-true (hl-preproc--overlay beg end))
+                      (setq last-true nil)))))))))
 
 (defun hl-preproc--after-cahnge (&rest _)
   "Unhighlight after change."
@@ -132,15 +183,17 @@ If REFRESH is non-nil, refresh cache once."
                              #'hl-preproc--do-highlight (current-buffer))))
 
 (defun hl-preproc--enable ()
-  "Start `hl-preproc-mode'."
+  "Start function `hl-preproc-mode'."
   (if (memq major-mode hl-preproc--supported-modes)
       (progn
-        (hl-preproc--do-highlight)  ; highlight once kimmediately after activation
+        (hl-preproc--do-highlight (current-buffer))  ; highlight once kimmediately after activation
         (add-hook 'after-change-functions #'hl-preproc--after-cahnge nil t))
+    (user-error "Hl-Preproc doesn't support current major-mode: %s" major-mode)
     (hl-preproc-mode -1)))
 
 (defun hl-preproc--disable ()
-  "Stop `hl-preproc-mode'."
+  "Stop function `hl-preproc-mode'."
+  (mapc #'delete-overlay hl-preproc--overlays)
   (remove-hook 'after-change-functions #'hl-preproc--after-cahnge t))
 
 ;;;###autoload
