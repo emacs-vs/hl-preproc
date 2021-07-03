@@ -23,6 +23,14 @@ To enable/disable this package.
 Extra define constants, just in case if [meta-net](https://github.com/emacs-vs/meta-net)
 does not parse define constants correctly.
 
+##### `hl-preproc-delay`
+
+Seconds of delay before highlighting invalid preprocessor regions.
+
+##### `hl-preproc-face`
+
+Face to highlight all invalid code.
+
 ## :link: References
 
 * [C# - Preprocessor Directives](https://www.tutorialspoint.com/csharp/csharp_preprocessor_directives.htm)
