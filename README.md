@@ -12,6 +12,21 @@
   :hook (csharp-mode . (lambda () (hl-preproc-mode 1))))
 ```
 
+## :hammer: Basic Usage
+
+##### `(hl-preproc-mode &optional ARG)`
+
+To enable/disable this package.
+
+##### `hl-preproc-extra-constants`
+
+Extra define constants, just in case if [meta-net](https://github.com/emacs-vs/meta-net)
+does not parse define constants correctly.
+
+## :link: References
+
+* [C# - Preprocessor Directives](https://www.tutorialspoint.com/csharp/csharp_preprocessor_directives.htm)
+
 ## Contribution
 
 If you would like to contribute to this project, you may either
