@@ -88,7 +88,7 @@
 (defun hl-preproc--get-constants ()
   "Return a list of constants from current project."
   (let (lst)
-    (dolist (path (meta-net-csporj-files))
+    (dolist (path (meta-net-csproj-files))
       (setq lst (append lst (meta-net-define-constants path))))
     lst))
 
