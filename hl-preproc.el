@@ -85,20 +85,13 @@
 ;; (@* "Constants" )
 ;;
 
-(defun hl-preproc--get-constants ()
-  "Return a list of constants from current project."
-  (let (lst)
-    (dolist (path (meta-net-csproj-files))
-      (setq lst (append lst (meta-net-define-constants path))))
-    lst))
-
 (defun hl-preproc-all-constants (&optional refresh)
   "Return all define constants.
 
 If REFRESH is non-nil, refresh cache once."
   (when (or refresh (null hl-preproc--define-constants))
     (setq hl-preproc--define-constants
-          (append hl-preproc-extra-constants (hl-preproc--get-constants)))
+          (append hl-preproc-extra-constants (meta-net-define-constants meta-net-csproj-current)))
     (cl-delete-duplicates hl-preproc--define-constants))
   hl-preproc--define-constants)
 
