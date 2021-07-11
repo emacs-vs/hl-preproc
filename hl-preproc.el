@@ -7,7 +7,7 @@
 ;; Description: Unhighlight invalid preprocessor region
 ;; Keyword: preprocessor
 ;; Version: 0.1.0
-;; Package-Requires: ((emacs "24.4") (meta-net "1.0.0"))
+;; Package-Requires: ((emacs "24.4") (meta-net "1.1.0"))
 ;; URL: https://github.com/emacs-vs/hl-preproc
 
 ;; This file is NOT part of GNU Emacs.
