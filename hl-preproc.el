@@ -122,7 +122,7 @@ If REFRESH is non-nil, refresh cache once."
        ;;
        ;; Basically, everything without nested logic should work!
        (and (string-match-p (format "\\_<%s\\_>" constant) expression)
-            (not (string-match-p (format "![ \t]*\\_<%s\\_>" constant) expression))))
+            (not (string-match-p (format "![ \t(]*\\_<%s\\_>" constant) expression))))
      constants)))
 
 (defun hl-preproc--overlay (beg end)
