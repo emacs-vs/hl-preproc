@@ -1,8 +1,9 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-![CI](https://github.com/emacs-vs/hl-preproc/workflows/CI/badge.svg)
 
 # hl-preproc
 > Unhighlight invalid preprocessor region
+
+![CI](https://github.com/emacs-vs/hl-preproc/workflows/CI/badge.svg)
 
 <p align="center">
   <img src="./etc/demo.gif" width="534" height="217"/>
