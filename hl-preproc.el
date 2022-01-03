@@ -1,6 +1,6 @@
 ;;; hl-preproc.el --- Unhighlight invalid preprocessor region  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2021  Shen, Jen-Chieh
+;; Copyright (C) 2021-2022  Shen, Jen-Chieh
 ;; Created date 2021-07-03 17:07:11
 
 ;; Author: Shen, Jen-Chieh <jcs090218@gmail.com>
