@@ -1,6 +1,6 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![CELPA](https://celpa.conao3.com/packages/hl-preproc-badge.svg)](https://celpa.conao3.com/#/hl-preproc)
-[![JCS-ELPA](https://raw.githubusercontent.com/jcs-emacs/jcs-elpa/master/badges/hl-preproc.svg)](https://jcs-emacs.github.io/jcs-elpa/#/hl-preproc)
+[![JCS-ELPA](https://raw.githubusercontent.com/jcs-emacs/jcs-elpa/master/badges/v/hl-preproc.svg)](https://jcs-emacs.github.io/jcs-elpa/#/hl-preproc)
 
 # hl-preproc
 > Unhighlight invalid preprocessor region
