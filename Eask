@@ -1,7 +1,12 @@
 (source "jcs-elpa")
 (source "melpa")
 
+(package "hl-preproc" "0.1.0" "Unhighlight invalid preprocessor region")
+
 (package-file "hl-preproc.el")
+
+(depends-on "emacs" "24.5")
+(depends-on "meta-net")
 
 (development
  (depends-on "ert-runner"))
