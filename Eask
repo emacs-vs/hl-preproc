@@ -1,4 +1,7 @@
-(package "hl-preproc" "0.1.0" "Unhighlight invalid preprocessor region")
+(package "hl-preproc"
+         "0.1.0"
+         "Unhighlight invalid preprocessor region")
+
 (package-file "hl-preproc.el")
 
 (source "jcs-elpa")
