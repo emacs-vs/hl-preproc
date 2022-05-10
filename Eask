@@ -1,14 +1,16 @@
-(package "hl-preproc"
-         "0.1.0"
-         "Unhighlight invalid preprocessor region")
+(package "line-reminder"
+         "0.5.1"
+         "Line annotation for changed and saved lines")
 
-(package-file "hl-preproc.el")
+(package-file "line-reminder.el")
 
-(source "jcs-elpa")
 (source "melpa")
 
-(depends-on "emacs" "24.5")
-(depends-on "meta-net")
+(depends-on "emacs" "25.1")
+(depends-on "indicators")
+(depends-on "fringe-helper")
+(depends-on "ov")
+(depends-on "ht")
 
 (development
  (depends-on "ert-runner"))
