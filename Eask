@@ -3,7 +3,7 @@
          "Unhighlight invalid preprocessor region")
 
 (website-url "https://github.com/emacs-vs/hl-preproc")
-(keywords "preprocessor")
+(keywords "convenience" "preprocessor")
 
 (package-file "hl-preproc.el")
 
