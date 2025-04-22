@@ -1,3 +1,5 @@
+;; -*- mode: eask; lexical-binding: t -*-
+
 (package "hl-preproc"
          "0.1.0"
          "Unhighlight invalid preprocessor region")
